@@ -57,34 +57,30 @@ async function removeFavorite(id) {
 }
 
 function renderFavorites(favorites) {
-    if (favorites.length === 0) {
-        favoritesGrid.innerHTML = `
+    const grid = document.getElementById('favoritesGrid');
+    grid.innerHTML = '';
+
+    if (!favorites || favorites.length === 0) {
+        grid.innerHTML = `
             <div class="empty-state">
-                <p>You haven't added any emojis to your favorites yet.</p>
-                <a href="/catalog.html" class="cta-button">Browse Emojis</a>
+                <p>No favorites yet. Start adding them from the catalog!</p>
+                <a href="catalog.html" class="cta-button">Browse Emojis</a>
             </div>
         `;
         return;
     }
 
-    favoritesGrid.innerHTML = favorites.map(emoji => {
-        const emojiChar = emoji.category === 'flags'
-            ? unicodeArrayToEmoji(emoji.unicode)
-            : emoji.htmlCode[0];
-        return `
-            <div class="emoji-card">
-                <div class="emoji-char">${emojiChar}</div>
-                <div class="emoji-name">${emoji.name}</div>
-                <div class="emoji-category">${emoji.category}</div>
-                <button 
-                    class="favorite-button active"
-                    onclick="removeFavorite('${emoji.id}')"
-                >
-                    ❤️
-                </button>
-            </div>
+    favorites.forEach(emoji => {
+        const card = document.createElement('div');
+        card.className = 'emoji-card';
+        card.innerHTML = `
+            <div class="emoji-char">${unicodeArrayToEmoji(emoji.unicode)}</div>
+            <h3 class="emoji-name">${emoji.name}</h3>
+            <span class="emoji-category">${emoji.category}</span>
+            <button class="favorite-button active" onclick="removeFavorite('${emoji.id}')">♥</button>
         `;
-    }).join('');
+        grid.appendChild(card);
+    });
 }
 
 loadFavorites(); 
