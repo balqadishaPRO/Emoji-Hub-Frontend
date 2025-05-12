@@ -1,17 +1,13 @@
 // API endpoint
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'https://emoji-hub-6odk.onrender.com/api';
 
-// DOM Elements
 const favoritesGrid = document.getElementById('favoritesGrid');
 
-// Helper to convert ["U+1F1E6", "U+1F1EB"] to the actual emoji
 function unicodeArrayToEmoji(unicodeArr) {
-    // Debug log
     console.log('Flag unicode array:', unicodeArr);
     return String.fromCodePoint(...unicodeArr.map(u => parseInt(u.replace('U+', ''), 16)));
 }
 
-// Load favorites
 async function loadFavorites() {
     try {
         const response = await fetch(`${API_URL}/favorites`);
@@ -29,18 +25,16 @@ async function loadFavorites() {
     }
 }
 
-// Remove from favorites
 async function removeFavorite(id) {
     try {
         const response = await fetch(`${API_URL}/favorites/${id}`, { method: 'DELETE' });
         if (!response.ok) throw new Error('Failed to remove favorite');
-        loadFavorites(); // Reload the list
+        loadFavorites();
     } catch (error) {
         console.error('Error removing favorite:', error);
     }
 }
 
-// Render favorites
 function renderFavorites(favorites) {
     if (favorites.length === 0) {
         favoritesGrid.innerHTML = `
@@ -72,5 +66,4 @@ function renderFavorites(favorites) {
     }).join('');
 }
 
-// Initial load
 loadFavorites(); 

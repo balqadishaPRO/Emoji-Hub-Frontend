@@ -1,22 +1,19 @@
 // API endpoint
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'https://emoji-hub-6odk.onrender.com/api';
 
-// State
 let emojis = [];
 let favorites = new Set();
 
-// DOM Elements
 const emojiGrid = document.getElementById('emojiGrid');
 const searchInput = document.getElementById('searchInput');
 const categoryFilter = document.getElementById('categoryFilter');
 const sortFilter = document.getElementById('sortFilter');
 
-// Load emojis from API
 async function loadEmojis() {
     try {
         const response = await fetch(`${API_URL}/emoji`);
         if (!response.ok) throw new Error('Failed to load emojis');
-        emojis = await response.json(); // Set global emojis array
+        emojis = await response.json();
         renderEmojis();
     } catch (error) {
         console.error('Error loading emojis:', error);
@@ -24,7 +21,6 @@ async function loadEmojis() {
     }
 }
 
-// Load favorites
 async function loadFavorites() {
     try {
         const response = await fetch(`${API_URL}/favorites`);
@@ -37,7 +33,6 @@ async function loadFavorites() {
     }
 }
 
-// Toggle favorite
 async function toggleFavorite(id) {
     try {
         const isFavorite = favorites.has(id);
@@ -58,7 +53,6 @@ async function toggleFavorite(id) {
     }
 }
 
-// Filter and sort emojis
 function getFilteredEmojis() {
     const searchTerm = searchInput.value.toLowerCase();
     const category = categoryFilter.value;
@@ -78,14 +72,11 @@ function getFilteredEmojis() {
         });
 }
 
-// Helper to convert ["U+1F1E6", "U+1F1EB"] to the actual emoji
 function unicodeArrayToEmoji(unicodeArr) {
-    // Debug log
     console.log('Flag unicode array:', unicodeArr);
     return String.fromCodePoint(...unicodeArr.map(u => parseInt(u.replace('U+', ''), 16)));
 }
 
-// Render emojis
 function renderEmojis() {
     console.log('Global emojis:', emojis);
     const filteredEmojis = getFilteredEmojis();
@@ -114,11 +105,9 @@ function renderEmojis() {
     }).join('');
 }
 
-// Event listeners
 searchInput.addEventListener('input', renderEmojis);
 categoryFilter.addEventListener('change', renderEmojis);
 sortFilter.addEventListener('change', renderEmojis);
 
-// Initial load
 loadEmojis();
 loadFavorites(); 
