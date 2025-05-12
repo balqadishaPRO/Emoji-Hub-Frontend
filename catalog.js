@@ -45,27 +45,32 @@ async function loadFavorites() {
 
 async function toggleFavorite(id) {
     try {
-        const isFavorite = favorites.has(id);
-        const method = isFavorite ? 'DELETE' : 'POST';
         const response = await fetch(`${API_URL}/favorites/${id}`, {
-            method,
-            credentials: 'include',
+            method: isFavorite ? 'DELETE' : 'POST',
+            credentials: 'include',  // Crucial for sending cookies
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         });
-        
-        if (!response.ok) throw new Error('Failed to update favorite');
-        
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error);
+        }
+
+        // Update local state immediately
         if (isFavorite) {
             favorites.delete(id);
         } else {
             favorites.add(id);
         }
         
+        // Visual feedback
         renderEmojis();
+        
     } catch (error) {
-        console.error('Error updating favorite:', error);
+        console.error('Error:', error);
+        alert('Failed to update favorite. Please try again.');
     }
 }
 
