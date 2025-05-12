@@ -46,4 +46,35 @@ async function removeFavorite(id) {
     }
 }
 
-// ... rest of the code remains the same ... 
+function renderFavorites(favorites) {
+    if (favorites.length === 0) {
+        favoritesGrid.innerHTML = `
+            <div class="empty-state">
+                <p>You haven't added any emojis to your favorites yet.</p>
+                <a href="/catalog.html" class="cta-button">Browse Emojis</a>
+            </div>
+        `;
+        return;
+    }
+
+    favoritesGrid.innerHTML = favorites.map(emoji => {
+        const emojiChar = emoji.category === 'flags'
+            ? unicodeArrayToEmoji(emoji.unicode)
+            : emoji.htmlCode[0];
+        return `
+            <div class="emoji-card">
+                <div class="emoji-char">${emojiChar}</div>
+                <div class="emoji-name">${emoji.name}</div>
+                <div class="emoji-category">${emoji.category}</div>
+                <button 
+                    class="favorite-button active"
+                    onclick="removeFavorite('${emoji.id}')"
+                >
+                    ❤️
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+loadFavorites(); 
