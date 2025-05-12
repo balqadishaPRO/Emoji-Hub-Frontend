@@ -57,7 +57,7 @@ function renderFavorites(favorites) {
             <h3 class="emoji-name">${emoji.name}</h3>
             <span class="emoji-category">${emoji.category}</span>
             <button class="favorite-button active" data-id="${emoji.id}">
-                ♥
+                ❤️
             </button>
         `;
         
