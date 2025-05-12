@@ -12,19 +12,29 @@ async function loadFavorites() {
     try {
         const response = await fetch(`${API_URL}/favorites`, {
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
         });
+        
         if (!response.ok) throw new Error('Failed to load favorites');
+        
         const favorites = await response.json();
+        
+        if (favorites.length === 0) { // Add this check
+            favoritesGrid.innerHTML = `
+                <div class="empty-state">
+                    <p>You haven't added any emojis to your favorites yet.</p>
+                    <a href="catalog.html" class="cta-button">Browse Emojis</a>
+                </div>
+            `;
+            return;
+        }
+        
         renderFavorites(favorites);
     } catch (error) {
         console.error('Error loading favorites:', error);
         favoritesGrid.innerHTML = `
             <div class="empty-state">
-                <p>You haven't added any emojis to your favorites yet.</p>
-                <a href="catalog.html" class="cta-button">Browse Emojis</a>
+                <p>Error loading favorites. ${error.message}</p>
+                <a href="catalog.html" class="cta-button">Try Again</a>
             </div>
         `;
     }
