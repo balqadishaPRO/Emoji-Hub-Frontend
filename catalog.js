@@ -29,48 +29,53 @@ async function loadEmojis() {
 async function loadFavorites() {
     try {
         const response = await fetch(`${API_URL}/favorites`, {
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            credentials: 'include', // ← Must include cookies
         });
-        if (!response.ok) throw new Error('Failed to load favorites');
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to load favorites');
+        }
+        
         const favs = await response.json();
         favorites = new Set(favs.map(f => f.id));
         renderEmojis();
+        
     } catch (error) {
-        console.error('Error loading favorites:', error);
+        console.error('Error:', error);
+        alert(`Error: ${error.message}`);
     }
 }
 
 async function toggleFavorite(id) {
     try {
+        const isFavorite = favorites.has(id);
+        const method = isFavorite ? 'DELETE' : 'POST';
+        
         const response = await fetch(`${API_URL}/favorites/${id}`, {
-            method: isFavorite ? 'DELETE' : 'POST',
-            credentials: 'include',  // Crucial for sending cookies
+            method,
+            credentials: 'include', // ← Must include cookies
             headers: {
                 'Content-Type': 'application/json',
             },
         });
 
         if (!response.ok) {
-            const error = await response.text();
-            throw new Error(error);
+            const error = await response.json(); // Parse error message
+            throw new Error(error.error || 'Failed to update favorite');
         }
 
-        // Update local state immediately
+        // Update UI immediately
         if (isFavorite) {
             favorites.delete(id);
         } else {
             favorites.add(id);
         }
-        
-        // Visual feedback
         renderEmojis();
         
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to update favorite. Please try again.');
+        alert(`Error: ${error.message}`); // Show actual error
     }
 }
 
