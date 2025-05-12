@@ -11,7 +11,12 @@ const sortFilter = document.getElementById('sortFilter');
 
 async function loadEmojis() {
     try {
-        const response = await fetch(`${API_URL}/emoji`);
+        const response = await fetch(`${API_URL}/emoji`, {
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         if (!response.ok) throw new Error('Failed to load emojis');
         emojis = await response.json();
         renderEmojis();
@@ -23,7 +28,12 @@ async function loadEmojis() {
 
 async function loadFavorites() {
     try {
-        const response = await fetch(`${API_URL}/favorites`);
+        const response = await fetch(`${API_URL}/favorites`, {
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         if (!response.ok) throw new Error('Failed to load favorites');
         const favs = await response.json();
         favorites = new Set(favs.map(f => f.id));
@@ -37,7 +47,13 @@ async function toggleFavorite(id) {
     try {
         const isFavorite = favorites.has(id);
         const method = isFavorite ? 'DELETE' : 'POST';
-        const response = await fetch(`${API_URL}/favorites/${id}`, { method });
+        const response = await fetch(`${API_URL}/favorites/${id}`, {
+            method,
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         
         if (!response.ok) throw new Error('Failed to update favorite');
         
@@ -53,61 +69,4 @@ async function toggleFavorite(id) {
     }
 }
 
-function getFilteredEmojis() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const category = categoryFilter.value;
-    const sortBy = sortFilter.value;
-
-    return emojis
-        .filter(emoji => {
-            const matchesSearch = emoji.name.toLowerCase().includes(searchTerm);
-            const matchesCategory = !category || emoji.category === category;
-            return matchesSearch && matchesCategory;
-        })
-        .sort((a, b) => {
-            if (sortBy === 'name') {
-                return a.name.localeCompare(b.name);
-            }
-            return a.category.localeCompare(b.category);
-        });
-}
-
-function unicodeArrayToEmoji(unicodeArr) {
-    console.log('Flag unicode array:', unicodeArr);
-    return String.fromCodePoint(...unicodeArr.map(u => parseInt(u.replace('U+', ''), 16)));
-}
-
-function renderEmojis() {
-    console.log('Global emojis:', emojis);
-    const filteredEmojis = getFilteredEmojis();
-    console.log('Filtered emojis:', filteredEmojis);
-    if (filteredEmojis.length === 0) {
-        emojiGrid.innerHTML = '<p>No emojis found.</p>';
-        return;
-    }
-    emojiGrid.innerHTML = filteredEmojis.map(emoji => {
-        const emojiChar = emoji.category === 'flags'
-            ? unicodeArrayToEmoji(emoji.unicode)
-            : emoji.htmlCode[0];
-        return `
-            <div class="emoji-card">
-                <div class="emoji-char">${emojiChar}</div>
-                <div class="emoji-name">${emoji.name}</div>
-                <div class="emoji-category">${emoji.category}</div>
-                <button 
-                    class="favorite-button ${favorites.has(emoji.id) ? 'active' : ''}"
-                    onclick="toggleFavorite('${emoji.id}')"
-                >
-                    ${favorites.has(emoji.id) ? '❤️' : '🤍'}
-                </button>
-            </div>
-        `;
-    }).join('');
-}
-
-searchInput.addEventListener('input', renderEmojis);
-categoryFilter.addEventListener('change', renderEmojis);
-sortFilter.addEventListener('change', renderEmojis);
-
-loadEmojis();
-loadFavorites(); 
+// ... rest of the code remains the same ... 

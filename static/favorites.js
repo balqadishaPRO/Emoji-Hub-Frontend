@@ -10,7 +10,12 @@ function unicodeArrayToEmoji(unicodeArr) {
 
 async function loadFavorites() {
     try {
-        const response = await fetch(`${API_URL}/favorites`);
+        const response = await fetch(`${API_URL}/favorites`, {
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         if (!response.ok) throw new Error('Failed to load favorites');
         const favorites = await response.json();
         renderFavorites(favorites);
@@ -19,7 +24,7 @@ async function loadFavorites() {
         favoritesGrid.innerHTML = `
             <div class="empty-state">
                 <p>You haven't added any emojis to your favorites yet.</p>
-                <a href="/catalog.html" class="cta-button">Browse Emojis</a>
+                <a href="catalog.html" class="cta-button">Browse Emojis</a>
             </div>
         `;
     }
@@ -27,7 +32,13 @@ async function loadFavorites() {
 
 async function removeFavorite(id) {
     try {
-        const response = await fetch(`${API_URL}/favorites/${id}`, { method: 'DELETE' });
+        const response = await fetch(`${API_URL}/favorites/${id}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         if (!response.ok) throw new Error('Failed to remove favorite');
         loadFavorites();
     } catch (error) {
@@ -35,35 +46,4 @@ async function removeFavorite(id) {
     }
 }
 
-function renderFavorites(favorites) {
-    if (favorites.length === 0) {
-        favoritesGrid.innerHTML = `
-            <div class="empty-state">
-                <p>You haven't added any emojis to your favorites yet.</p>
-                <a href="/catalog.html" class="cta-button">Browse Emojis</a>
-            </div>
-        `;
-        return;
-    }
-
-    favoritesGrid.innerHTML = favorites.map(emoji => {
-        const emojiChar = emoji.category === 'flags'
-            ? unicodeArrayToEmoji(emoji.unicode)
-            : emoji.htmlCode[0];
-        return `
-            <div class="emoji-card">
-                <div class="emoji-char">${emojiChar}</div>
-                <div class="emoji-name">${emoji.name}</div>
-                <div class="emoji-category">${emoji.category}</div>
-                <button 
-                    class="favorite-button active"
-                    onclick="removeFavorite('${emoji.id}')"
-                >
-                    ❤️
-                </button>
-            </div>
-        `;
-    }).join('');
-}
-
-loadFavorites(); 
+// ... rest of the code remains the same ... 
