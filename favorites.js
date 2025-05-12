@@ -2,16 +2,17 @@ const API_URL = 'https://emoji-hub-6odk.onrender.com/api';
 const favoritesGrid = document.getElementById('favoritesGrid');
 
 function unicodeArrayToEmoji(unicodeArr) {
-    try {
-        return String.fromCodePoint(...unicodeArr.map(u => 
-            parseInt(u.replace('U+', ''), 16)
-        ));
-    } catch (error) {
-        console.error('Error converting unicode:', error);
-        return '❌';
+    if (unicodeArr.length === 1 && /^[A-Za-z]{2}$/.test(unicodeArr[0])) {
+        const countryCode = unicodeArr[0].toUpperCase();
+        return countryCode.split('').map(c => 
+            String.fromCodePoint(0x1F1E6 - 65 + c.charCodeAt(0))
+        ).join('');
     }
+    
+    return String.fromCodePoint(...unicodeArr.map(u => 
+        parseInt(u.replace('U+', ''), 16)
+    ));
 }
-
 async function loadFavorites() {
     try {
         const response = await fetch(`${API_URL}/favorites`, {

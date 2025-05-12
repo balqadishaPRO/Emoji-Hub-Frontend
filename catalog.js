@@ -98,26 +98,24 @@ function getFilteredEmojis() {
         });
 }
 
-// Helper to convert ["U+1F1E6", "U+1F1EB"] to the actual emoji
 function unicodeArrayToEmoji(unicodeArr) {
-    // Debug log
-    console.log('Flag unicode array:', unicodeArr);
-    return String.fromCodePoint(...unicodeArr.map(u => parseInt(u.replace('U+', ''), 16)));
+    if (unicodeArr.length === 1 && /^[A-Za-z]{2}$/.test(unicodeArr[0])) {
+        const countryCode = unicodeArr[0].toUpperCase();
+        return countryCode.split('').map(c => 
+            String.fromCodePoint(0x1F1E6 - 65 + c.charCodeAt(0))
+        ).join('');
+    }
+    
+    return String.fromCodePoint(...unicodeArr.map(u => 
+        parseInt(u.replace('U+', ''), 16)
+    ));
 }
 
 // Render emojis
 function renderEmojis() {
-    console.log('Global emojis:', emojis);
     const filteredEmojis = getFilteredEmojis();
-    console.log('Filtered emojis:', filteredEmojis);
-    if (filteredEmojis.length === 0) {
-        emojiGrid.innerHTML = '<p>No emojis found.</p>';
-        return;
-    }
     emojiGrid.innerHTML = filteredEmojis.map(emoji => {
-        const emojiChar = emoji.category === 'flags'
-            ? unicodeArrayToEmoji(emoji.unicode)
-            : emoji.htmlCode[0];
+        const emojiChar = unicodeArrayToEmoji(emoji.unicode); // Use this for ALL emojis
         return `
             <div class="emoji-card">
                 <div class="emoji-char">${emojiChar}</div>
